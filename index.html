@@ -68,15 +68,16 @@ body::after{
 .wrap{width:100%;max-width:min(var(--max),100%);margin:0 auto;padding:0 28px;position:relative;z-index:3}
 
 /* ── 진입 애니메이션 ── */
-.rv{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
-.rv.in{opacity:1;transform:none}
+.rv{opacity:1;transform:none}
+.js-anim .rv{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.js-anim .rv.in{opacity:1;transform:none}
 .rv[data-d="1"]{transition-delay:.09s}
 .rv[data-d="2"]{transition-delay:.18s}
 .rv[data-d="3"]{transition-delay:.27s}
 .rv[data-d="4"]{transition-delay:.36s}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
-  .rv{opacity:1;transform:none;transition:none}
+  .js-anim .rv{opacity:1;transform:none;transition:none}
   .hairline{animation:none!important;height:100%!important}
 }
 
@@ -375,7 +376,6 @@ footer{border-top:1px solid var(--line-2);padding:46px 0 60px;font-size:13px;col
 .dock a{min-width:0;text-align:center;justify-content:center;padding:13px 4px;font-size:14px;white-space:nowrap}
 @media(max-width:760px){.dock{display:grid}body{padding-bottom:74px}}
 </style>
-<noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
 </head>
 <body>
 
@@ -824,67 +824,71 @@ const SALON = {
    아래 코드는 손대지 않으셔도 됩니다.
    ═══════════════════════════════════════════════════════════════ */
 
-const IG_URL = "https://instagram.com/" + SALON.instagram;
-const IG_DM  = "https://ig.me/m/" + SALON.instagram;
-const WA_URL = "https://wa.me/" + SALON.whatsapp;
+try {
+  const IG_URL = "https://instagram.com/" + SALON.instagram;
+  const IG_DM  = "https://ig.me/m/" + SALON.instagram;
+  const WA_URL = "https://wa.me/" + SALON.whatsapp;
 
-let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "ko";
+  let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "ko";
 
-/* 링크 연결 */
-["heroIg","finalIg","navCta","dockIg"].forEach(id => { const e=document.getElementById(id); if(e) e.href = IG_DM; });
-["heroWa","finalWa","dockWa","footWa"].forEach(id => { const e=document.getElementById(id); if(e) e.href = WA_URL; });
-["galIg","footIg"].forEach(id => { const e=document.getElementById(id); if(e) e.href = IG_URL; });
-document.getElementById("year").textContent = new Date().getFullYear();
+  /* 링크 연결 */
+  ["heroIg","finalIg","navCta","dockIg"].forEach(id => { const e=document.getElementById(id); if(e) e.href = IG_DM; });
+  ["heroWa","finalWa","dockWa","footWa"].forEach(id => { const e=document.getElementById(id); if(e) e.href = WA_URL; });
+  ["galIg","footIg"].forEach(id => { const e=document.getElementById(id); if(e) e.href = IG_URL; });
+  document.getElementById("year").textContent = new Date().getFullYear();
 
-/* 메뉴 */
-document.getElementById("menuList").innerHTML = SALON.menu.map(m => `
-  <div class="menu-row">
-    <span class="menu-name" data-ko="${m.name.ko}" data-en="${m.name.en}">${m.name.ko}</span>
-    <span class="menu-desc" data-ko="${m.desc.ko}" data-en="${m.desc.en}">${m.desc.ko}</span>
-    <span class="menu-price">${m.price}</span>
-  </div>`).join("");
+  /* 메뉴 */
+  document.getElementById("menuList").innerHTML = SALON.menu.map(m => `
+    <div class="menu-row">
+      <span class="menu-name" data-ko="${m.name.ko}" data-en="${m.name.en}">${m.name.ko}</span>
+      <span class="menu-desc" data-ko="${m.desc.ko}" data-en="${m.desc.en}">${m.desc.ko}</span>
+      <span class="menu-price">${m.price}</span>
+    </div>`).join("");
 
-/* 갤러리 */
-document.getElementById("gallery").innerHTML = SALON.gallery.map(g => g.src
-  ? `<figure class="shot"><img src="${g.src}" alt="${g.alt.ko}" data-alt-ko="${g.alt.ko}" data-alt-en="${g.alt.en}" loading="lazy"></figure>`
-  : `<figure class="shot"><div class="ph"><b>PHOTO</b><span data-ko="${g.alt.ko}" data-en="${g.alt.en}">${g.alt.ko}</span></div></figure>`
-).join("");
+  /* 갤러리 */
+  document.getElementById("gallery").innerHTML = SALON.gallery.map(g => g.src
+    ? `<figure class="shot"><img src="${g.src}" alt="${g.alt.ko}" data-alt-ko="${g.alt.ko}" data-alt-en="${g.alt.en}" loading="lazy"></figure>`
+    : `<figure class="shot"><div class="ph"><b>PHOTO</b><span data-ko="${g.alt.ko}" data-en="${g.alt.en}">${g.alt.ko}</span></div></figure>`
+  ).join("");
 
-/* 신뢰 수치 */
-document.getElementById("trustNums").innerHTML = SALON.trust.map(t => `
-  <div class="tnum rv">
-    <b>${t.num}</b>
-    <span data-ko="${t.label.ko}" data-en="${t.label.en}">${t.label.ko}</span>
-  </div>`).join("");
+  /* 신뢰 수치 */
+  document.getElementById("trustNums").innerHTML = SALON.trust.map(t => `
+    <div class="tnum rv">
+      <b>${t.num}</b>
+      <span data-ko="${t.label.ko}" data-en="${t.label.en}">${t.label.ko}</span>
+    </div>`).join("");
 
-/* 지점 목록 */
-const mapOf = n => "https://map.naver.com/p/search/" + encodeURIComponent("에이치플레이스 " + n);
-document.getElementById("branchList").innerHTML = SALON.branches.map(b => `
-  <div class="br rv">
-    <span class="br-area">${b.area}</span>
-    <p class="br-name" data-ko="${b.name.ko}" data-en="${b.name.en}">${b.name.ko}</p>
-    <p class="br-line"><i data-ko="주소" data-en="Address">주소</i><span data-ko="${b.addr.ko}" data-en="${b.addr.en}">${b.addr.ko}</span></p>
-    <p class="br-line"><i data-ko="전화" data-en="Phone">전화</i><span>${b.tel}</span></p>
-    <p class="br-line"><i data-ko="시간" data-en="Hours">시간</i><span>${b.hours}</span></p>
-    <div class="br-foot">
-      <a href="${mapOf(b.name.ko)}" target="_blank" rel="noopener" data-ko="지도 보기" data-en="Map">지도 보기</a>
-      <a href="tel:${b.tel.replace(/-/g,"")}" data-ko="전화 걸기" data-en="Call">전화 걸기</a>
-    </div>
-  </div>`).join("");
+  /* 지점 목록 */
+  const mapOf = n => "https://map.naver.com/p/search/" + encodeURIComponent("에이치플레이스 " + n);
+  document.getElementById("branchList").innerHTML = SALON.branches.map(b => `
+    <div class="br rv">
+      <span class="br-area">${b.area}</span>
+      <p class="br-name" data-ko="${b.name.ko}" data-en="${b.name.en}">${b.name.ko}</p>
+      <p class="br-line"><i data-ko="주소" data-en="Address">주소</i><span data-ko="${b.addr.ko}" data-en="${b.addr.en}">${b.addr.ko}</span></p>
+      <p class="br-line"><i data-ko="전화" data-en="Phone">전화</i><span>${b.tel}</span></p>
+      <p class="br-line"><i data-ko="시간" data-en="Hours">시간</i><span>${b.hours}</span></p>
+      <div class="br-foot">
+        <a href="${mapOf(b.name.ko)}" target="_blank" rel="noopener" data-ko="지도 보기" data-en="Map">지도 보기</a>
+        <a href="tel:${b.tel.replace(/-/g,"")}" data-ko="전화 걸기" data-en="Call">전화 걸기</a>
+      </div>
+    </div>`).join("");
 
-/* 전 지점 공통 안내 */
-document.getElementById("commonInfo").innerHTML = SALON.common.map(i => `
-  <div class="info-row">
-    <b data-ko="${i.label.ko}" data-en="${i.label.en}">${i.label.ko}</b>
-    <span data-ko="${i.value.ko}" data-en="${i.value.en}">${i.value.ko}</span>
-  </div>`).join("");
+  /* 전 지점 공통 안내 */
+  document.getElementById("commonInfo").innerHTML = SALON.common.map(i => `
+    <div class="info-row">
+      <b data-ko="${i.label.ko}" data-en="${i.label.en}">${i.label.ko}</b>
+      <span data-ko="${i.value.ko}" data-en="${i.value.en}">${i.value.ko}</span>
+    </div>`).join("");
 
-/* FAQ */
-document.getElementById("faqList").innerHTML = SALON.faq.map(f => `
-  <details>
-    <summary data-ko="${f.q.ko}" data-en="${f.q.en}">${f.q.ko}</summary>
-    <div class="ans" data-ko="${f.a.ko}" data-en="${f.a.en}">${f.a.ko}</div>
-  </details>`).join("");
+  /* FAQ */
+  document.getElementById("faqList").innerHTML = SALON.faq.map(f => `
+    <details>
+      <summary data-ko="${f.q.ko}" data-en="${f.q.en}">${f.q.ko}</summary>
+      <div class="ans" data-ko="${f.a.ko}" data-en="${f.a.en}">${f.a.ko}</div>
+    </details>`).join("");
+} catch (err) {
+  console.error("[h.place] SALON 설정에 오류가 있습니다. 쉼표나 따옴표가 빠졌는지 확인하세요.", err);
+}
 
 /* 언어 전환 */
 function applyLang(next){
@@ -897,36 +901,39 @@ function applyLang(next){
 document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)));
 if (lang === "en") applyLang("en");
 
-/* 첫 화면은 기다리지 않고 바로 보이게 합니다 */
-requestAnimationFrame(() => {
-  document.querySelectorAll("header.hero .rv").forEach(el => el.classList.add("in"));
-});
+</script>
 
-/* 스크롤 진입 애니메이션 (자바스크립트가 막혀도 내용은 항상 보입니다) */
-if ("IntersectionObserver" in window){
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+<script>
+/* 화면 효과 — 위 설정에 오류가 있어도 이 부분은 항상 실행됩니다 */
+(function(){
+  if (!("IntersectionObserver" in window)) return;      // 옛 브라우저면 효과 없이 그대로 보임
+  document.documentElement.classList.add("js-anim");    // 여기서부터 애니메이션 적용
+
+  requestAnimationFrame(function(){
+    document.querySelectorAll("header.hero .rv").forEach(function(el){ el.classList.add("in"); });
+  });
+
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
   }, { threshold:.12, rootMargin:"0px 0px -6% 0px" });
-  document.querySelectorAll("section .rv, .final .rv").forEach(el => io.observe(el));
-} else {
-  document.querySelectorAll(".rv").forEach(el => el.classList.add("in"));
-}
-setTimeout(() => document.querySelectorAll(".rv").forEach(el => {
-  const r = el.getBoundingClientRect();
-  if (r.top < innerHeight * 1.2) el.classList.add("in");
-}), 1200);
+  document.querySelectorAll("section .rv, .final .rv").forEach(function(el){ io.observe(el); });
 
-/* 시그니처 : 세로 헤어라인이 스크롤에 맞춰 그려집니다 */
-const hlIo = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) e.target.style.height = "100%"; });
-}, { threshold:.1 });
-document.querySelectorAll(".hairline").forEach(el => hlIo.observe(el));
+  setTimeout(function(){
+    document.querySelectorAll(".rv").forEach(function(el){
+      if (el.getBoundingClientRect().top < innerHeight * 1.2) el.classList.add("in");
+    });
+  }, 1200);
 
-/* 스크롤하면 상단바에 선이 생깁니다 */
-const navEl = document.getElementById("nav");
-const onScroll = () => navEl.classList.toggle("solid", window.scrollY > 40);
-onScroll();
-window.addEventListener("scroll", onScroll, { passive:true });
+  var hlIo = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting) e.target.style.height = "100%"; });
+  }, { threshold:.1 });
+  document.querySelectorAll(".hairline").forEach(function(el){ hlIo.observe(el); });
+
+  var navEl = document.getElementById("nav");
+  function onScroll(){ navEl.classList.toggle("solid", window.scrollY > 40); }
+  onScroll();
+  window.addEventListener("scroll", onScroll, { passive:true });
+})();
 </script>
 </body>
 </html>
