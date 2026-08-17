@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>H.PLACE — Seoul Hair, In Your Language</title>
+<meta name="description" content="말이 통하는 서울 헤어살롱. 방문 전 모국어 상담, 앉기 전 확정 가격, 사진으로 확인하고 시작합니다.">
+<meta property="og:title" content="H.PLACE — Seoul Hair, In Your Language">
+<meta property="og:description" content="We talk before you arrive. You show us the photo. The price is fixed before you sit down.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+<style>
+/* ─────────────────────────────────────────────
+   FONT — Paperlogy (사이트 안에 직접 담겨 있어 인터넷 폰트 서버가 필요 없습니다)
+   ───────────────────────────────────────────── */
+@font-face{
+  font-family:"Paperlogy"; font-style:normal; font-weight:400; font-display:swap;
+  src:url("assets/fonts/paperlogy-400.woff") format("woff");
+}
+@font-face{
+  font-family:"Paperlogy"; font-style:normal; font-weight:600; font-display:swap;
+  src:url("assets/fonts/paperlogy-600.woff") format("woff");
+}
+@font-face{
+  font-family:"Paperlogy"; font-style:normal; font-weight:800; font-display:swap;
+  src:url("assets/fonts/paperlogy-800.woff") format("woff");
+}
+
+:root{
+  --bg:#08080a;
+  --bg-2:#101013;
+  --bg-3:#17171b;
+  --line:rgba(255,255,255,.10);
+  --line-2:rgba(255,255,255,.06);
+  --ink:#f3f1ed;
+  --ink-2:#a8a49c;
+  --ink-3:#6d6a64;
+  --gold:#c9a063;
+  --gold-dim:#8f7245;
+  --max:1180px;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;max-width:100%;overflow-x:clip}
+p,h1,h2,li,span,summary,div{word-break:keep-all;overflow-wrap:break-word}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:"Paperlogy","Pretendard","Apple SD Gothic Neo",system-ui,sans-serif;
+  font-weight:400; line-height:1.7; letter-spacing:-.01em;
+  -webkit-font-smoothing:antialiased; overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+
+/* grain + vignette : 사이트 전체에 은은한 질감 */
+body::before{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:1; opacity:.5;
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(201,160,99,.07), transparent 55%),
+    radial-gradient(circle at 90% 90%, rgba(201,160,99,.05), transparent 50%);
+}
+body::after{
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:2; opacity:.022;
+  background-image:repeating-linear-gradient(0deg,#fff 0 1px,transparent 1px 4px);
+  mix-blend-mode:overlay;
+}
+.wrap{width:100%;max-width:min(var(--max),100%);margin:0 auto;padding:0 28px;position:relative;z-index:3}
+
+/* ── 진입 애니메이션 ── */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.rv.in{opacity:1;transform:none}
+.rv[data-d="1"]{transition-delay:.09s}
+.rv[data-d="2"]{transition-delay:.18s}
+.rv[data-d="3"]{transition-delay:.27s}
+.rv[data-d="4"]{transition-delay:.36s}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none;transition:none}
+  .hairline{animation:none!important;height:100%!important}
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  backdrop-filter:blur(14px);background:rgba(8,8,10,.62);
+  border-bottom:1px solid transparent;transition:border-color .4s,background .4s
+}
+nav.solid{border-bottom-color:var(--line-2);background:rgba(8,8,10,.9)}
+.nav-in{max-width:var(--max);margin:0 auto;padding:16px 28px;display:flex;align-items:center;gap:20px}
+.logo{font-weight:800;font-size:19px;letter-spacing:.14em}
+.logo span{color:var(--gold)}
+.nav-links{display:flex;gap:26px;margin-left:auto;font-size:14px;color:var(--ink-2)}
+.nav-links a{transition:color .3s}
+.nav-links a:hover{color:var(--ink)}
+.lang{display:flex;align-items:center;gap:2px;font-size:12.5px;color:var(--ink-3);
+  border:1px solid var(--line);border-radius:999px;padding:4px;letter-spacing:.06em}
+.lang button{
+  font:inherit;background:none;border:0;color:var(--ink-3);cursor:pointer;
+  padding:3px 11px;border-radius:999px;transition:.3s
+}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg);font-weight:600}
+.nav-cta{
+  font-size:13.5px;font-weight:600;padding:9px 18px;border-radius:999px;
+  background:var(--gold);color:#12100c;transition:.3s;white-space:nowrap
+}
+.nav-cta:hover{background:#dcb478}
+@media(max-width:860px){.nav-links{display:none}}
+
+/* ── HERO ── */
+header.hero{
+  min-height:100svh;display:flex;align-items:center;position:relative;
+  padding:120px 0 90px;overflow:hidden
+}
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 110%, rgba(201,160,99,.16), transparent 70%),
+    linear-gradient(180deg,#08080a 0%,#0c0c0f 55%,#08080a 100%)
+}
+.hero-ring{
+  position:absolute;right:-14vw;top:50%;transform:translateY(-50%);
+  width:62vw;height:62vw;max-width:760px;max-height:760px;border-radius:50%;
+  border:1px solid rgba(201,160,99,.16);z-index:0;
+  animation:breathe 11s ease-in-out infinite
+}
+.hero-ring::after{
+  content:"";position:absolute;inset:14%;border-radius:50%;
+  border:1px solid rgba(255,255,255,.05)
+}
+@keyframes breathe{0%,100%{transform:translateY(-50%) scale(1)}50%{transform:translateY(-50%) scale(1.035)}}
+.eyebrow{
+  font-size:12px;letter-spacing:.3em;color:var(--gold);font-weight:600;
+  text-transform:uppercase;margin-bottom:26px
+}
+h1{
+  font-weight:800;font-size:clamp(38px,6.4vw,78px);line-height:1.14;letter-spacing:-.035em;
+  max-width:15ch
+}
+h1 em{font-style:normal;color:var(--gold)}
+.hero-sub{
+  margin-top:26px;font-size:clamp(15px,1.5vw,19px);color:var(--ink-2);
+  max-width:46ch;line-height:1.75
+}
+.hero-cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:40px}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;padding:15px 27px;border-radius:999px;
+  font-size:15px;font-weight:600;transition:.3s var(--ease)
+}
+.btn-gold{background:var(--gold);color:#12100c}
+.btn-gold:hover{background:#dcb478;transform:translateY(-2px)}
+.btn-ghost{border:1px solid var(--line);color:var(--ink)}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);transform:translateY(-2px)}
+.btn svg{width:17px;height:17px;flex:none}
+.hero-note{margin-top:22px;font-size:13px;color:var(--ink-3)}
+.scroll-cue{
+  position:absolute;bottom:34px;left:50%;transform:translateX(-50%);z-index:3;
+  font-size:11px;letter-spacing:.24em;color:var(--ink-3);text-align:center
+}
+.scroll-cue i{display:block;width:1px;height:46px;margin:12px auto 0;background:linear-gradient(var(--gold),transparent)}
+
+/* ── SECTION 공통 ── */
+section{padding:118px 0;position:relative}
+.kicker{
+  font-size:11.5px;letter-spacing:.26em;color:var(--gold);font-weight:600;
+  text-transform:uppercase;margin-bottom:18px
+}
+h2{font-weight:800;font-size:clamp(27px,3.6vw,44px);line-height:1.22;letter-spacing:-.03em;max-width:20ch}
+.lead{margin-top:18px;color:var(--ink-2);font-size:16px;max-width:56ch}
+.divider{height:1px;background:var(--line-2);max-width:var(--max);margin:0 auto}
+
+/* signature : 세로 헤어라인 */
+.hairline-track{position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line-2);z-index:0}
+.hairline{position:absolute;top:0;left:0;width:100%;background:linear-gradient(var(--gold),transparent);height:0;transition:height 1.6s var(--ease)}
+@media(max-width:860px){.hairline-track{display:none}}
+
+/* ── 브랜드 소개 ── */
+#about h2{max-width:30ch}
+.about-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;margin-top:52px;align-items:center}
+@media(max-width:900px){.about-grid{grid-template-columns:1fr;gap:38px}}
+.about-story p{color:var(--ink-2);font-size:16px;line-height:1.85;margin-bottom:22px;max-width:52ch}
+.about-story p:last-child{margin-bottom:0;color:var(--ink)}
+.pillars{display:flex;flex-direction:column;gap:14px}
+.pil{
+  border:1px solid var(--line-2);border-radius:16px;padding:24px 26px;
+  background:linear-gradient(180deg,var(--bg-2),rgba(16,16,19,.35));transition:.45s var(--ease)
+}
+.pil:hover{border-color:rgba(201,160,99,.28);transform:translateX(4px)}
+.pil b{display:block;font-weight:800;font-size:17px;letter-spacing:-.02em;margin-bottom:9px}
+.pil span{display:block;font-size:14px;color:var(--ink-2);line-height:1.72}
+.pil.accent{border-color:rgba(201,160,99,.3);background:linear-gradient(180deg,rgba(201,160,99,.09),rgba(16,16,19,.4))}
+.pil.accent b{color:var(--gold)}
+.quote{
+  margin-top:64px;padding:44px 0 0;border-top:1px solid var(--line-2);
+  font-weight:800;font-size:clamp(21px,2.6vw,32px);line-height:1.5;letter-spacing:-.025em;
+  color:var(--ink);max-width:26ch
+}
+
+.about-shot{border-radius:18px;overflow:hidden;border:1px solid var(--line-2);position:relative}
+.about-shot img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+.about-shot::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,transparent 45%,rgba(8,8,10,.55) 100%)}
+.pillars{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:14px;margin-top:24px}
+.slogan{margin-top:70px;padding-top:46px;border-top:1px solid var(--line-2);
+  display:flex;gap:34px;align-items:center;flex-wrap:wrap}
+.slogan img{width:104px;height:auto;flex:none;opacity:.95;
+  mix-blend-mode:screen;filter:grayscale(1) brightness(1.45) contrast(1.15)}
+.slogan blockquote{font-weight:800;font-size:clamp(20px,2.5vw,31px);line-height:1.45;
+  letter-spacing:-.025em;color:var(--ink)}
+.slogan p{margin-top:12px;font-size:14.5px;color:var(--gold);letter-spacing:.01em}
+.slogan-text{flex:1;min-width:260px}
+@media(max-width:620px){.slogan{gap:22px}.slogan img{width:74px}}
+
+/* ── 와이드 밴드 사진 ── */
+.band{position:relative;margin-top:46px;border-radius:20px;overflow:hidden;border:1px solid var(--line-2)}
+.band img{width:100%;aspect-ratio:16/7;object-fit:cover;display:block}
+.band figcaption{position:absolute;left:28px;bottom:22px;font-size:14.5px;font-weight:600;
+  color:var(--ink);text-shadow:0 2px 18px rgba(0,0,0,.75)}
+.band::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(8,8,10,.15) 0%,transparent 40%,rgba(8,8,10,.7) 100%)}
+@media(max-width:620px){.band img{aspect-ratio:4/3}.band figcaption{left:18px;bottom:16px;font-size:13px}}
+
+/* ── 히어로 H 마크 ── */
+.hero-mark{
+  position:absolute;right:8vw;top:50%;transform:translateY(-50%);
+  width:min(30vw,360px);height:auto;z-index:0;opacity:.62;
+  mix-blend-mode:screen;filter:grayscale(1) brightness(1.5) contrast(1.1);
+  pointer-events:none
+}
+@media(max-width:900px){.hero-mark{right:-6vw;width:54vw;opacity:.34}}
+
+/* ── 걱정 3가지 ── */
+.fears{display:grid;grid-template-columns:repeat(auto-fit,minmax(272px,1fr));gap:20px;margin-top:56px}
+.fear{
+  background:linear-gradient(180deg,var(--bg-2),rgba(16,16,19,.4));
+  border:1px solid var(--line-2);border-radius:18px;padding:34px 30px 32px;
+  transition:.45s var(--ease)
+}
+.fear:hover{border-color:rgba(201,160,99,.3);transform:translateY(-4px)}
+.fear-q{font-size:13px;color:var(--ink-3);margin-bottom:14px}
+.fear-a{font-weight:800;font-size:21px;line-height:1.35;letter-spacing:-.02em;margin-bottom:14px}
+.fear-d{font-size:14.5px;color:var(--ink-2);line-height:1.7}
+.fear-n{
+  display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50%;
+  border:1px solid rgba(201,160,99,.4);color:var(--gold);font-size:12.5px;font-weight:600;margin-bottom:22px
+}
+
+/* ── 4단계 ── */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:0;margin-top:60px;
+  border-top:1px solid var(--line-2)}
+.step{padding:34px 26px 34px 0;border-right:1px solid var(--line-2);position:relative}
+.step:last-child{border-right:0}
+.step-n{font-size:12px;letter-spacing:.2em;color:var(--gold);font-weight:600;margin-bottom:16px}
+.step-t{font-weight:800;font-size:18px;letter-spacing:-.02em;margin-bottom:10px}
+.step-d{font-size:14px;color:var(--ink-2);line-height:1.7;padding-right:14px}
+@media(max-width:760px){.step{border-right:0;border-bottom:1px solid var(--line-2);padding-right:0}}
+
+/* ── 가격표 ── */
+.menu{margin-top:52px;border-top:1px solid var(--line)}
+.menu-row{
+  display:flex;align-items:baseline;gap:18px;padding:22px 4px;border-bottom:1px solid var(--line-2);
+  transition:.35s
+}
+.menu-row:hover{background:rgba(255,255,255,.022);padding-left:12px}
+.menu-name{font-weight:600;font-size:17px;min-width:190px}
+.menu-desc{font-size:13.5px;color:var(--ink-3);flex:1}
+.menu-price{font-weight:800;font-size:17px;color:var(--gold);white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:640px){
+  .menu-row{flex-wrap:wrap;gap:6px}
+  .menu-name{min-width:100%}.menu-desc{flex:1 1 60%}
+}
+.price-notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:36px}
+.pn{background:var(--bg-2);border:1px solid var(--line-2);border-radius:14px;padding:20px 22px}
+.pn b{display:block;color:var(--gold);font-size:13px;font-weight:600;margin-bottom:7px;letter-spacing:.02em}
+.pn span{font-size:13.5px;color:var(--ink-2);line-height:1.65}
+
+/* ── 갤러리 ── */
+.gal{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin-top:52px}
+.shot{
+  position:relative;aspect-ratio:4/5;border-radius:16px;overflow:hidden;
+  background:linear-gradient(150deg,#131317,#0b0b0e 60%,#161219);
+  border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center
+}
+.shot img{width:100%;height:100%;object-fit:cover}
+.shot .ph{text-align:center;padding:20px}
+.shot .ph b{display:block;color:var(--ink-3);font-size:12px;letter-spacing:.18em;margin-bottom:8px}
+.shot .ph span{font-size:12.5px;color:#4a4844;line-height:1.6}
+.shot::after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(circle at 50% 120%, rgba(201,160,99,.12), transparent 60%)
+}
+
+/* ── FAQ ── */
+.faq{margin-top:50px;border-top:1px solid var(--line-2)}
+.faq details{border-bottom:1px solid var(--line-2)}
+.faq summary{
+  list-style:none;cursor:pointer;padding:24px 44px 24px 0;position:relative;
+  font-weight:600;font-size:16.5px;transition:color .3s
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:hover{color:var(--gold)}
+.faq summary::after{
+  content:"";position:absolute;right:8px;top:50%;width:11px;height:11px;
+  border-right:1.5px solid var(--ink-3);border-bottom:1.5px solid var(--ink-3);
+  transform:translateY(-70%) rotate(45deg);transition:.35s var(--ease)
+}
+.faq details[open] summary::after{transform:translateY(-20%) rotate(-135deg);border-color:var(--gold)}
+.faq .ans{padding:0 40px 26px 0;color:var(--ink-2);font-size:15px;line-height:1.8}
+
+/* ── 오시는 길 ── */
+.visit{display:grid;grid-template-columns:1.15fr 1fr;gap:56px;margin-top:52px;align-items:start}
+@media(max-width:860px){.visit{grid-template-columns:1fr;gap:34px}}
+.info-row{display:flex;gap:18px;padding:20px 0;border-bottom:1px solid var(--line-2)}
+.info-row b{min-width:96px;font-size:13px;color:var(--ink-3);font-weight:600;letter-spacing:.04em;padding-top:2px}
+.info-row span{font-size:15.5px;color:var(--ink)}
+.map-card{
+  border:1px solid var(--line-2);border-radius:18px;padding:30px;background:var(--bg-2)
+}
+.map-card p{color:var(--ink-2);font-size:14.5px;line-height:1.75;margin-bottom:22px}
+
+/* ── 신뢰 수치 ── */
+.trust{padding:66px 0}
+.tnums{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:20px}
+.tnum{text-align:center}
+.tnum b{display:block;font-weight:800;font-size:clamp(30px,3.4vw,42px);color:var(--gold);letter-spacing:-.03em;line-height:1.1}
+.tnum span{display:block;margin-top:8px;font-size:13.5px;color:var(--ink-2)}
+
+/* ── 지점 안내 ── */
+.branches{display:grid;grid-template-columns:repeat(auto-fit,minmax(292px,1fr));gap:16px;margin-top:52px}
+.br{
+  background:linear-gradient(180deg,var(--bg-2),rgba(16,16,19,.35));
+  border:1px solid var(--line-2);border-radius:16px;padding:26px 24px 22px;
+  transition:.45s var(--ease);display:flex;flex-direction:column
+}
+.br:hover{border-color:rgba(201,160,99,.32);transform:translateY(-3px)}
+.br-area{font-size:11.5px;letter-spacing:.18em;color:var(--gold);font-weight:600;text-transform:uppercase}
+.br-name{font-weight:800;font-size:19px;letter-spacing:-.02em;margin:10px 0 14px}
+.br-line{display:flex;gap:12px;font-size:13.5px;color:var(--ink-2);padding:5px 0;line-height:1.6}
+.br-line i{font-style:normal;color:var(--ink-3);min-width:44px;font-size:12.5px;padding-top:1px}
+.br-foot{display:flex;gap:10px;margin-top:auto;padding-top:18px}
+.br-foot a{
+  flex:1;text-align:center;font-size:13px;font-weight:600;padding:10px 0;border-radius:999px;
+  border:1px solid var(--line);transition:.3s
+}
+.br-foot a:hover{border-color:var(--gold);color:var(--gold)}
+.br.soon{opacity:.5}
+.br.soon .br-name{color:var(--ink-3)}
+.common{
+  margin-top:34px;border:1px solid var(--line-2);border-radius:16px;padding:30px 32px;background:var(--bg-2)
+}
+.common h3{font-weight:800;font-size:18px;letter-spacing:-.02em;margin-bottom:8px}
+.common .info-row:last-child{border-bottom:0}
+
+/* ── 마지막 CTA ── */
+.final{
+  text-align:center;padding:130px 0 120px;
+  background:radial-gradient(ellipse 70% 100% at 50% 0%, rgba(201,160,99,.13), transparent 65%)
+}
+.final h2{margin:0 auto;max-width:18ch}
+.final .lead{margin:20px auto 0;text-align:center}
+.final .hero-cta{justify-content:center}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--line-2);padding:46px 0 60px;font-size:13px;color:var(--ink-3)}
+.foot-in{display:flex;flex-wrap:wrap;gap:18px;align-items:center;justify-content:space-between}
+.foot-links{display:flex;gap:20px}
+.foot-links a{transition:color .3s}
+.foot-links a:hover{color:var(--gold)}
+
+/* 모바일 하단 고정 예약 바 */
+.dock{
+  position:fixed;left:0;right:0;bottom:0;z-index:60;display:none;grid-template-columns:1fr 1fr;gap:9px;padding:11px 14px calc(11px + env(safe-area-inset-bottom));
+  background:rgba(8,8,10,.93);backdrop-filter:blur(14px);border-top:1px solid var(--line-2)
+}
+.dock a{min-width:0;text-align:center;justify-content:center;padding:13px 4px;font-size:14px;white-space:nowrap}
+@media(max-width:760px){.dock{display:grid}body{padding-bottom:74px}}
+</style>
+<noscript><style>.rv{opacity:1!important;transform:none!important}</style></noscript>
+</head>
+<body>
+
+<!-- ══════════════ NAV ══════════════ -->
+<nav id="nav">
+  <div class="nav-in">
+    <a href="#top" class="logo">H<span>.</span>PLACE</a>
+    <div class="nav-links">
+      <a href="#about" data-ko="브랜드 소개" data-en="About">브랜드 소개</a>
+      <a href="#why"   data-ko="왜 여기인가"  data-en="Why us">왜 여기인가</a>
+      <a href="#how"   data-ko="상담 방법"    data-en="How it works">상담 방법</a>
+      <a href="#menu"  data-ko="메뉴 · 가격"  data-en="Menu &amp; Price">메뉴 · 가격</a>
+      <a href="#faq"   data-ko="자주 묻는 질문" data-en="FAQ">자주 묻는 질문</a>
+      <a href="#branches" data-ko="지점 안내" data-en="Branches">지점 안내</a>
+    </div>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="ko" aria-pressed="true">KO</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+    </div>
+    <a class="nav-cta" id="navCta" href="#" target="_blank" rel="noopener"
+       data-ko="상담하기" data-en="Message us">상담하기</a>
+  </div>
+</nav>
+
+<!-- ══════════════ HERO ══════════════ -->
+<header class="hero" id="top">
+  <div class="hero-bg"></div>
+  <div class="hero-ring"></div>
+  <img class="hero-mark" src="assets/photos/h-mark.png" alt="" aria-hidden="true">
+  <div class="wrap">
+    <p class="eyebrow rv" data-ko="서울 · 분당 16개 지점 · 외국인 고객 전담" data-en="16 branches in Seoul &amp; Bundang · For international guests">서울 · 분당 16개 지점 · 외국인 고객 전담</p>
+    <h1 class="rv" data-d="1"
+        data-ko="서울 헤어,<br><em>말이 통하는</em> 곳"
+        data-en="Seoul hair,<br><em>in your</em> language">서울 헤어,<br><em>말이 통하는</em> 곳</h1>
+    <p class="hero-sub rv" data-d="2"
+       data-ko="방문 전에 모국어로 상담합니다. 원하는 사진을 함께 보고 확인합니다. 가격은 의자에 앉기 전에 확정됩니다."
+       data-en="We talk before you arrive. We look at your photo together. The price is fixed before you sit down.">
+       방문 전에 모국어로 상담합니다. 원하는 사진을 함께 보고 확인합니다. 가격은 의자에 앉기 전에 확정됩니다.</p>
+    <div class="hero-cta rv" data-d="3">
+      <a class="btn btn-gold" id="heroIg" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.1" fill="currentColor" stroke="none"/></svg>
+        <span data-ko="인스타그램 DM 보내기" data-en="Message on Instagram">인스타그램 DM 보내기</span>
+      </a>
+      <a class="btn btn-ghost" id="heroWa" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M21 11.5a8.4 8.4 0 0 1-12.6 7.3L3 20.5l1.8-5.2A8.4 8.4 0 1 1 21 11.5z"/></svg>
+        <span data-ko="WhatsApp으로 문의" data-en="Chat on WhatsApp">WhatsApp으로 문의</span>
+      </a>
+    </div>
+    <p class="hero-note rv" data-d="4"
+       data-ko="한국어 · English · 日本語 · 中文 상담 가능"
+       data-en="Consultation available in English, Japanese, Chinese and Korean">한국어 · English · 日本語 · 中文 상담 가능</p>
+  </div>
+  <div class="scroll-cue"><span data-ko="아래로" data-en="SCROLL">아래로</span><i></i></div>
+</header>
+
+<div class="divider"></div>
+
+<!-- ══════════════ 신뢰 수치 ══════════════ -->
+<section class="trust">
+  <div class="wrap">
+    <div class="tnums" id="trustNums"></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ 브랜드 소개 ══════════════ -->
+<section id="about">
+  <div class="wrap">
+    <p class="kicker rv" data-ko="브랜드 소개" data-en="About us">브랜드 소개</p>
+    <h2 class="rv" data-d="1"
+        data-ko="8년, 열여섯 곳.<br>그래도 저희가 세는 숫자는 하나입니다"
+        data-en="Eight years, sixteen salons.<br>One number we actually count">8년, 열여섯 곳.<br>그래도 저희가 세는 숫자는 하나입니다</h2>
+
+    <div class="about-grid">
+      <div class="about-story rv" data-d="2">
+        <p data-ko="에이치플레이스는 함성소리 미용그룹에서 시작했습니다. 서초의 한 매장에서 출발해 교대, 잠실, 분당까지 8년에 걸쳐 열여섯 곳이 됐습니다. 늘린 방법은 단순합니다. 오셨던 분이 다시 오셨기 때문입니다."
+           data-en="H.PLACE began inside Hamseongsori Beauty Group. It started as one salon in Seocho and grew over eight years into sixteen, through Gyodae, Jamsil and Bundang. The way it grew is simple. People came back.">
+           에이치플레이스는 함성소리 미용그룹에서 시작했습니다. 서초의 한 매장에서 출발해 교대, 잠실, 분당까지 8년에 걸쳐 열여섯 곳이 됐습니다. 늘린 방법은 단순합니다. 오셨던 분이 다시 오셨기 때문입니다.</p>
+
+        <p data-ko="저희가 신입 디자이너에게 가장 먼저 가르치는 것은 기술이 아니라 듣는 법입니다. &lsquo;소통과 경청&rsquo;은 브랜드를 만들 때 정한 문장이고, 8년이 지난 지금도 첫 순서입니다. 아름다움은 손끝에 닿기 전에 대화에서 결정된다고 보기 때문입니다."
+           data-en="The first thing we teach a new stylist is not technique. It is how to listen. &lsquo;Listen, then speak&rsquo; was written into this brand on day one, and eight years later it is still lesson one. We think beauty is decided in the conversation, before it ever reaches our hands.">
+           저희가 신입 디자이너에게 가장 먼저 가르치는 것은 기술이 아니라 듣는 법입니다. &lsquo;소통과 경청&rsquo;은 브랜드를 만들 때 정한 문장이고, 8년이 지난 지금도 첫 순서입니다. 아름다움은 손끝에 닿기 전에 대화에서 결정된다고 보기 때문입니다.</p>
+
+        <p data-ko="이 방식은 한국어가 편하지 않은 분께 특히 중요합니다. 잘 듣는 살롱은 언어가 달라도 잘 듣습니다. 저희가 시술보다 상담을 먼저, 그것도 모국어로 하는 이유입니다."
+           data-en="This matters most when Korean is not your language. A salon that listens well listens well in any language. That is why we do the consultation first, and we do it in yours.">
+           이 방식은 한국어가 편하지 않은 분께 특히 중요합니다. 잘 듣는 살롱은 언어가 달라도 잘 듣습니다. 저희가 시술보다 상담을 먼저, 그것도 모국어로 하는 이유입니다.</p>
+      </div>
+
+      <figure class="about-shot rv" data-d="3">
+        <img src="assets/photos/stylist-portrait.jpg" alt="H.PLACE 디자이너" loading="lazy">
+      </figure>
+    </div>
+
+    <div class="pillars">
+        <div class="pil rv" data-d="1">
+          <b data-ko="함성소리 미용그룹 · 8년" data-en="Hamseongsori Beauty Group · 8 years">함성소리 미용그룹 · 8년</b>
+          <span data-ko="서초의 한 매장에서 시작해 서울과 분당 열여섯 곳으로. 브랜드 1호점인 서초아크로비스타점에는 디자이너 20명이 함께합니다."
+                data-en="From one salon in Seocho to sixteen across Seoul and Bundang. Our first branded location, Seocho Acro Vista, is home to twenty stylists.">서초의 한 매장에서 시작해 서울과 분당 열여섯 곳으로. 브랜드 1호점인 서초아크로비스타점에는 디자이너 20명이 함께합니다.</span>
+        </div>
+        <div class="pil rv" data-d="2">
+          <b data-ko="160여 명, 같은 기준" data-en="160 stylists, one standard">160여 명, 같은 기준</b>
+          <span data-ko="어느 지점에 가셔도 같은 방식으로 묻고, 같은 방식으로 설명합니다. 지점이 바뀌어도 경험이 달라지지 않게 하는 것이 저희 일입니다."
+                data-en="Whichever branch you walk into, we ask the same questions and explain the same way. Keeping the experience identical across sixteen places is our job.">어느 지점에 가셔도 같은 방식으로 묻고, 같은 방식으로 설명합니다. 지점이 바뀌어도 경험이 달라지지 않게 하는 것이 저희 일입니다.</span>
+        </div>
+        <div class="pil rv accent" data-d="3">
+          <b data-ko="재방문율 90%" data-en="90% come back">재방문율 90%</b>
+          <span data-ko="열 분 중 아홉 분이 다시 찾아주십니다. 광고로 만들 수 없는 숫자이고, 저희가 보는 유일한 성적표입니다."
+                data-en="Nine in ten guests return. It is not a number you can buy with advertising, and it is the only report card we look at.">열 분 중 아홉 분이 다시 찾아주십니다. 광고로 만들 수 없는 숫자이고, 저희가 보는 유일한 성적표입니다.</span>
+        </div>
+    </div>
+
+    <div class="slogan rv" data-d="1">
+      <img src="assets/photos/h-mark.png" alt="H.PLACE" loading="lazy">
+      <div class="slogan-text">
+        <blockquote
+          data-ko="사람의 마음을 이해하는 것이<br>진짜 아름다움을 만드는 열쇠입니다"
+          data-en="Understanding the heart of a person<br>is the key to creating true beauty">사람의 마음을 이해하는 것이<br>진짜 아름다움을 만드는 열쇠입니다</blockquote>
+        <p data-ko="우리는 아름다움을 만들기 위해 사람의 마음을 공부합니다."
+           data-en="We study the human heart to create beauty.">우리는 아름다움을 만들기 위해 사람의 마음을 공부합니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ 걱정 3가지 ══════════════ -->
+<section id="why">
+  <div class="hairline-track"><div class="hairline" id="hl1"></div></div>
+  <div class="wrap">
+    <p class="kicker rv" data-ko="왜 여기인가" data-en="Why us">왜 여기인가</p>
+    <h2 class="rv" data-d="1"
+        data-ko="한국 미용실이 겁나는 이유는<br>보통 세 가지입니다"
+        data-en="Three things make a Korean salon<br>feel intimidating">한국 미용실이 겁나는 이유는<br>보통 세 가지입니다</h2>
+    <p class="lead rv" data-d="2"
+       data-ko="저희는 그 세 가지를 없애는 방식으로 운영합니다."
+       data-en="We built the way we work around removing all three.">저희는 그 세 가지를 없애는 방식으로 운영합니다.</p>
+
+    <div class="fears">
+      <div class="fear rv" data-d="1">
+        <span class="fear-n">01</span>
+        <p class="fear-q" data-ko="&ldquo;원하는 걸 설명하지 못할 것 같아&rdquo;" data-en="&ldquo;I won't be able to explain what I want.&rdquo;">&ldquo;원하는 걸 설명하지 못할 것 같아&rdquo;</p>
+        <p class="fear-a" data-ko="설명은 오시기 전에 끝냅니다" data-en="We finish the talking before you arrive">설명은 오시기 전에 끝냅니다</p>
+        <p class="fear-d"
+           data-ko="예약하시면 방문 전에 모국어로 상담합니다. 원하는 스타일 사진을 보내주시면 지금 모발 상태로 가능한지, 몇 번 방문이 필요한지 미리 알려드립니다."
+           data-en="After you book, we consult in your language before you come. Send the photo you like and we tell you what is possible with your hair today, and how many visits it needs.">
+           예약하시면 방문 전에 모국어로 상담합니다. 원하는 스타일 사진을 보내주시면 지금 모발 상태로 가능한지, 몇 번 방문이 필요한지 미리 알려드립니다.</p>
+      </div>
+      <div class="fear rv" data-d="2">
+        <span class="fear-n">02</span>
+        <p class="fear-q" data-ko="&ldquo;얼마 나올지 모르겠어&rdquo;" data-en="&ldquo;I have no idea what it will cost.&rdquo;">&ldquo;얼마 나올지 모르겠어&rdquo;</p>
+        <p class="fear-a" data-ko="앉기 전에 최종 금액을 드립니다" data-en="You get the final number before you sit down">앉기 전에 최종 금액을 드립니다</p>
+        <p class="fear-d"
+           data-ko="기장 추가금까지 포함한 최종 금액을 시술 시작 전에 확정해 드립니다. 시작한 뒤에 금액이 올라가는 일은 없습니다. 한국에서는 팁을 내지 않습니다."
+           data-en="The final price, long-hair surcharge included, is confirmed before we start. It never goes up once we begin. And tipping is not a thing in Korea.">
+           기장 추가금까지 포함한 최종 금액을 시술 시작 전에 확정해 드립니다. 시작한 뒤에 금액이 올라가는 일은 없습니다. 한국에서는 팁을 내지 않습니다.</p>
+      </div>
+      <div class="fear rv" data-d="3">
+        <span class="fear-n">03</span>
+        <p class="fear-q" data-ko="&ldquo;원하던 것과 다르게 나올까 봐&rdquo;" data-en="&ldquo;What if it comes out wrong?&rdquo;">&ldquo;원하던 것과 다르게 나올까 봐&rdquo;</p>
+        <p class="fear-a" data-ko="사진으로 확인하고 시작합니다" data-en="We agree on the photo, then we start">사진으로 확인하고 시작합니다</p>
+        <p class="fear-d"
+           data-ko="시작 전에 목표 이미지를 함께 보고, 단계마다 무엇을 하는지 설명합니다. 집에서 어떻게 손질하는지도 끝나기 전에 직접 보여드립니다."
+           data-en="We look at the target image together before starting, and explain each step as we go. Before you leave we show you how to style it at home.">
+           시작 전에 목표 이미지를 함께 보고, 단계마다 무엇을 하는지 설명합니다. 집에서 어떻게 손질하는지도 끝나기 전에 직접 보여드립니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ 4단계 ══════════════ -->
+<section id="how">
+  <div class="wrap">
+    <p class="kicker rv" data-ko="상담 방법" data-en="How it works">상담 방법</p>
+    <h2 class="rv" data-d="1" data-ko="예약부터 시술까지 네 단계" data-en="Four steps, start to finish">예약부터 시술까지 네 단계</h2>
+    <p class="lead rv" data-d="2"
+       data-ko="전화를 걸 필요가 없습니다. 메시지 한 통이면 시작됩니다."
+       data-en="No phone call needed. One message starts everything.">전화를 걸 필요가 없습니다. 메시지 한 통이면 시작됩니다.</p>
+
+    <figure class="band rv" data-d="1">
+      <img src="assets/photos/consult-wide.jpg" alt="H.PLACE 상담 장면" loading="lazy">
+      <figcaption data-ko="시술보다 상담이 먼저입니다" data-en="The consultation comes before the scissors">시술보다 상담이 먼저입니다</figcaption>
+    </figure>
+
+    <div class="steps">
+      <div class="step rv" data-d="1">
+        <p class="step-n">STEP 01</p>
+        <p class="step-t" data-ko="사진을 보내주세요" data-en="Send us a photo">사진을 보내주세요</p>
+        <p class="step-d" data-ko="인스타그램 DM이나 WhatsApp으로 원하는 스타일 사진과 지금 머리 사진을 보내주세요." data-en="Send the style you want and a photo of your hair today, on Instagram DM or WhatsApp.">인스타그램 DM이나 WhatsApp으로 원하는 스타일 사진과 지금 머리 사진을 보내주세요.</p>
+      </div>
+      <div class="step rv" data-d="2">
+        <p class="step-n">STEP 02</p>
+        <p class="step-t" data-ko="모국어로 상담합니다" data-en="We consult in your language">모국어로 상담합니다</p>
+        <p class="step-d" data-ko="탈색 이력, 모발 상태, 원하는 톤을 확인합니다. 가능한 것과 어려운 것을 솔직하게 말씀드립니다." data-en="We check your bleaching history, hair condition and the tone you want, then tell you honestly what is and isn't possible.">탈색 이력, 모발 상태, 원하는 톤을 확인합니다. 가능한 것과 어려운 것을 솔직하게 말씀드립니다.</p>
+      </div>
+      <div class="step rv" data-d="3">
+        <p class="step-n">STEP 03</p>
+        <p class="step-t" data-ko="가격과 시간을 확정합니다" data-en="Price and time confirmed">가격과 시간을 확정합니다</p>
+        <p class="step-d" data-ko="기장 추가를 포함한 최종 금액과 예상 소요 시간을 문자로 남겨드립니다. 그대로 진행됩니다." data-en="You get the final price including any long-hair surcharge, plus how long it takes, in writing. That is what you pay.">기장 추가를 포함한 최종 금액과 예상 소요 시간을 문자로 남겨드립니다. 그대로 진행됩니다.</p>
+      </div>
+      <div class="step rv" data-d="4">
+        <p class="step-n">STEP 04</p>
+        <p class="step-t" data-ko="오셔서 앉으시면 됩니다" data-en="Just come and sit down">오셔서 앉으시면 됩니다</p>
+        <p class="step-d" data-ko="상담 내용은 담당 디자이너에게 이미 전달돼 있습니다. 도착해서 다시 설명하실 필요가 없습니다." data-en="Your consultation is already with your stylist. You will not have to explain anything twice.">상담 내용은 담당 디자이너에게 이미 전달돼 있습니다. 도착해서 다시 설명하실 필요가 없습니다.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ 메뉴 · 가격 ══════════════ -->
+<section id="menu">
+  <div class="wrap">
+    <p class="kicker rv" data-ko="메뉴 · 가격" data-en="Menu &amp; Price">메뉴 · 가격</p>
+    <h2 class="rv" data-d="1" data-ko="숨은 금액은 없습니다" data-en="No hidden numbers">숨은 금액은 없습니다</h2>
+    <p class="lead rv" data-d="2"
+       data-ko="아래는 시작가입니다. 모발 길이와 상태에 따른 최종 금액은 상담에서 확정해 드립니다."
+       data-en="These are starting prices. Your final number is confirmed in the consultation, based on length and condition.">
+       아래는 시작가입니다. 모발 길이와 상태에 따른 최종 금액은 상담에서 확정해 드립니다.</p>
+
+    <div class="menu rv" data-d="1" id="menuList"><!-- 아래 SALON.menu 에서 자동으로 채워집니다 --></div>
+
+    <div class="price-notes">
+      <div class="pn rv" data-d="1">
+        <b data-ko="기장 추가" data-en="Long-hair surcharge">기장 추가</b>
+        <span data-ko="어깨 아래 길이는 추가금이 붙습니다. 상담 때 금액에 포함해서 알려드리고, 시작한 뒤에는 바뀌지 않습니다." data-en="Hair below the shoulder carries a surcharge. We include it in the number we give you, and it does not change once we start.">어깨 아래 길이는 추가금이 붙습니다. 상담 때 금액에 포함해서 알려드리고, 시작한 뒤에는 바뀌지 않습니다.</span>
+      </div>
+      <div class="pn rv" data-d="2">
+        <b data-ko="팁 없음" data-en="No tipping">팁 없음</b>
+        <span data-ko="한국에서는 미용실에서 팁을 내지 않습니다. 표시된 금액이 내시는 전부입니다." data-en="Tipping is not customary at salons in Korea. What you are quoted is what you pay.">한국에서는 미용실에서 팁을 내지 않습니다. 표시된 금액이 내시는 전부입니다.</span>
+      </div>
+      <div class="pn rv" data-d="3">
+        <b data-ko="커트 포함 여부" data-en="Is the cut included?">커트 포함 여부</b>
+        <span data-ko="컬러와 펌 가격에 커트가 포함되는지 상담에서 먼저 확인해 드립니다. 나중에 붙는 항목이 없습니다." data-en="We tell you upfront whether a cut is included with your colour or perm. Nothing gets added later.">컬러와 펌 가격에 커트가 포함되는지 상담에서 먼저 확인해 드립니다. 나중에 붙는 항목이 없습니다.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ 갤러리 ══════════════ -->
+<section id="work">
+  <div class="wrap">
+    <p class="kicker rv" data-ko="시술 사례" data-en="Our work">시술 사례</p>
+    <h2 class="rv" data-d="1" data-ko="말보다 결과가 빠릅니다" data-en="The result speaks first">말보다 결과가 빠릅니다</h2>
+    <p class="lead rv" data-d="2"
+       data-ko="더 많은 사례는 인스타그램에서 보실 수 있습니다."
+       data-en="More work on our Instagram.">더 많은 사례는 인스타그램에서 보실 수 있습니다.</p>
+    <div class="gal" id="gallery"><!-- SALON.gallery 에서 자동으로 채워집니다 --></div>
+    <div class="hero-cta rv" data-d="2" style="margin-top:34px">
+      <a class="btn btn-ghost" id="galIg" href="#" target="_blank" rel="noopener">
+        <span data-ko="인스타그램에서 더 보기" data-en="See more on Instagram">인스타그램에서 더 보기</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ FAQ ══════════════ -->
+<section id="faq">
+  <div class="wrap">
+    <p class="kicker rv" data-ko="자주 묻는 질문" data-en="FAQ">자주 묻는 질문</p>
+    <h2 class="rv" data-d="1" data-ko="오시기 전에 궁금한 것들" data-en="Before you come">오시기 전에 궁금한 것들</h2>
+    <div class="faq rv" data-d="2" id="faqList"><!-- SALON.faq 에서 자동으로 채워집니다 --></div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ══════════════ 지점 안내 ══════════════ -->
+<section id="branches">
+  <div class="wrap">
+    <p class="kicker rv" data-ko="지점 안내" data-en="Branches">지점 안내</p>
+    <h2 class="rv" data-d="1" data-ko="가까운 지점으로 오세요" data-en="Come to the branch nearest you">가까운 지점으로 오세요</h2>
+    <p class="lead rv" data-d="2"
+       data-ko="어느 지점이 편한지 모르시면 메시지로 지금 계신 곳만 알려주세요. 가장 가까운 지점과 가는 방법을 보내드립니다."
+       data-en="Not sure which branch suits you? Just tell us where you are staying and we will send you the closest one and how to get there.">
+       어느 지점이 편한지 모르시면 메시지로 지금 계신 곳만 알려주세요. 가장 가까운 지점과 가는 방법을 보내드립니다.</p>
+
+    <div class="branches" id="branchList"></div>
+
+    <div class="common rv" data-d="1">
+      <h3 data-ko="전 지점 공통 안내" data-en="Same at every branch">전 지점 공통 안내</h3>
+      <div id="commonInfo"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ 마지막 CTA ══════════════ -->
+<section class="final">
+  <div class="wrap">
+    <h2 class="rv" data-ko="사진 한 장만 보내주세요" data-en="Just send us one photo">사진 한 장만 보내주세요</h2>
+    <p class="lead rv" data-d="1"
+       data-ko="나머지는 저희가 정리해서 알려드립니다. 예약은 그다음입니다."
+       data-en="We will work out the rest and tell you. Booking comes after that.">나머지는 저희가 정리해서 알려드립니다. 예약은 그다음입니다.</p>
+    <div class="hero-cta rv" data-d="2">
+      <a class="btn btn-gold" id="finalIg" href="#" target="_blank" rel="noopener">
+        <span data-ko="인스타그램 DM 보내기" data-en="Message on Instagram">인스타그램 DM 보내기</span>
+      </a>
+      <a class="btn btn-ghost" id="finalWa" href="#" target="_blank" rel="noopener">
+        <span data-ko="WhatsApp으로 문의" data-en="Chat on WhatsApp">WhatsApp으로 문의</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-in">
+    <span>© <span id="year"></span> H.PLACE. All rights reserved.</span>
+    <div class="foot-links">
+      <a id="footIg" href="#" target="_blank" rel="noopener">Instagram</a>
+      <a id="footWa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+      <a href="#top" data-ko="맨 위로" data-en="Back to top">맨 위로</a>
+    </div>
+  </div>
+</footer>
+
+<!-- 모바일 하단 고정 바 -->
+<div class="dock">
+  <a class="btn btn-gold" id="dockIg" href="#" target="_blank" rel="noopener"><span data-ko="인스타 DM" data-en="Instagram">인스타 DM</span></a>
+  <a class="btn btn-ghost" id="dockWa" href="#" target="_blank" rel="noopener"><span data-ko="WhatsApp" data-en="WhatsApp">WhatsApp</span></a>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   ▼▼▼  여기만 고치시면 됩니다  ▼▼▼
+   아래 값만 실제 정보로 바꾸면 사이트 전체가 따라서 바뀝니다.
+   따옴표 " " 안의 글자만 바꾸시고, 쉼표와 괄호는 건드리지 마세요.
+   ═══════════════════════════════════════════════════════════════ */
+const SALON = {
+
+  /* 인스타그램 아이디 (@ 없이) */
+  instagram: "h.place_official",
+
+  /* WhatsApp 번호 — 국가번호부터 숫자만. 한국 010-1234-5678 → "821012345678"
+     ※ 아직 실제 번호가 아닙니다. 외국인 문의를 받을 번호로 바꿔주세요. */
+  whatsapp: "821000000000",
+
+  /* 브랜드 숫자 — 손님에게 보여줄 신뢰 지표 */
+  trust: [
+    { num:"16",   label:{ko:"서울 · 분당 지점",   en:"branches in Seoul & Bundang"} },
+    { num:"160+", label:{ko:"함께하는 디자이너",  en:"stylists on our team"} },
+    { num:"90%",  label:{ko:"재방문율",          en:"guests who come back"} },
+    { num:"8년",  label:{ko:"한자리에서 쌓은 시간", en:"years of building this"} }
+  ],
+
+  /* ── 지점 목록 ────────────────────────────────────────────────
+     name  : 지점 이름 (ko / en)
+     area  : 지역 표시
+     addr  : 주소
+     tel   : 전화번호
+     hours : 영업시간
+     확인된 5개 지점만 채워져 있습니다. 나머지 11개는 아래 형식대로
+     복사해서 추가하시면 됩니다. 주소·전화는 꼭 확인해 주세요.
+     ──────────────────────────────────────────────────────────── */
+  branches: [
+    { area:"SEOCHO",  name:{ko:"서초아크로비스타점", en:"Seocho Acro Vista"},
+      addr:{ko:"서울 서초구 서초동 1685-3 로비층 112-2, 3호", en:"Lobby fl. 112-2·3, 1685-3 Seocho-dong, Seocho-gu, Seoul"},
+      tel:"0507-2006-1879", hours:"10:00 – 20:00" },
+
+    { area:"SEOCHO",  name:{ko:"서초교대점", en:"Seocho Gyodae"},
+      addr:{ko:"서울 서초구 서초동 1574-10 2층", en:"2F, 1574-10 Seocho-dong, Seocho-gu, Seoul"},
+      tel:"0507-2006-3221", hours:"10:30 – 20:00" },
+
+    { area:"SONGPA",  name:{ko:"송파헬리오시티점", en:"Songpa Helio City"},
+      addr:{ko:"서울 송파구 가락동 913 헬리오시티 상가 지하1층 146호", en:"B1 #146, Helio City Mall, 913 Garak-dong, Songpa-gu, Seoul"},
+      tel:"0507-2006-3512", hours:"10:00 – 20:00" },
+
+    { area:"SONGPA",  name:{ko:"잠실학원사거리점", en:"Jamsil Hagwon Intersection"},
+      addr:{ko:"서울 송파구 삼전동 1-1 1층", en:"1F, 1-1 Samjeon-dong, Songpa-gu, Seoul"},
+      tel:"0507-2006-4585", hours:"10:00 – 20:00" },
+
+    { area:"BUNDANG", name:{ko:"정자역점", en:"Jeongja Station"},
+      addr:{ko:"경기 성남시 분당구 정자동 162-2 D동 202호", en:"D-202, 162-2 Jeongja-dong, Bundang-gu, Seongnam"},
+      tel:"0507-2007-6184", hours:"10:00 – 20:00" }
+
+    /* ↓ 나머지 11개 지점을 여기에 추가하세요. 위 한 덩어리를 복사해서 붙이면 됩니다.
+    ,{ area:"지역",  name:{ko:"○○점", en:"OO Branch"},
+       addr:{ko:"주소", en:"Address in English"},
+       tel:"0507-0000-0000", hours:"10:00 – 20:00" }
+    */
+  ],
+
+  /* 전 지점 공통 안내 */
+  common: [
+    { label:{ko:"영업시간", en:"Hours"},    value:{ko:"매일 10:00 – 20:00 (지점별로 조금씩 다릅니다)", en:"Daily 10:00 – 20:00, varies slightly by branch"} },
+    { label:{ko:"언어",     en:"Languages"}, value:{ko:"한국어 · English · 日本語 · 中文 (사전 상담 기준)", en:"Korean · English · Japanese · Chinese (for pre-visit consultation)"} },
+    { label:{ko:"결제",     en:"Payment"},  value:{ko:"해외 발급 카드 · 현금 · 알리페이 · 위챗페이", en:"Internationally issued cards · Cash · Alipay · WeChat Pay"} },
+    { label:{ko:"예약",     en:"Booking"},  value:{ko:"인스타그램 DM 또는 WhatsApp — 전화 없이 가능합니다", en:"Instagram DM or WhatsApp — no phone call needed"} }
+  ],
+
+  /* 메뉴와 시작가
+     ※ 아래 금액은 예약 플랫폼에 올라온 할인가를 참고한 임시값입니다.
+        공식 가격으로 반드시 바꿔주세요. */
+  menu: [
+    { name:{ko:"커트",              en:"Cut"},              desc:{ko:"상담 · 샴푸 · 스타일링 포함",      en:"Consultation, shampoo and styling included"}, price:"₩00,000~" },
+    { name:{ko:"컬러 (전체)",        en:"Full colour"},      desc:{ko:"톤 다운 · 애쉬 · 브라운 계열",     en:"Tone down, ash and brown tones"},            price:"₩00,000~" },
+    { name:{ko:"뿌리 염색",          en:"Root touch-up"},    desc:{ko:"자라난 부분만 정리",              en:"New growth only"},                           price:"₩00,000~" },
+    { name:{ko:"볼륨매직 · 아이롱",   en:"Volume magic · Setting perm"}, desc:{ko:"커트 포함 세트", en:"Set with cut included"},                          price:"₩150,000~" },
+    { name:{ko:"에어펌 · 빌드펌",     en:"Air perm · Build perm"}, desc:{ko:"커트 포함 세트",           en:"Set with cut included"},                      price:"₩174,000~" },
+    { name:{ko:"헤드스파 · 두피 케어", en:"Head spa · Scalp care"}, desc:{ko:"두피 진단 · 딥클렌징 · 마사지", en:"Scalp check, deep cleansing, massage"},   price:"₩00,000~" },
+    { name:{ko:"모발 클리닉",        en:"Hair treatment"},   desc:{ko:"손상 모발 집중 케어",             en:"Intensive care for damaged hair"},           price:"₩00,000~" }
+  ],
+
+  /* 시술 사진 — assets/photos/ 에 넣고 파일 이름을 적으세요. 없으면 "" 로 두세요. */
+  gallery: [
+    { src:"assets/photos/result.jpg",   alt:{ko:"단발 레이어드 컷",   en:"Layered bob"} },
+    { src:"assets/photos/interior.jpg", alt:{ko:"살롱 내부",         en:"Inside the salon"} },
+    { src:"assets/photos/consult.jpg",  alt:{ko:"시술 전 상담",      en:"Consultation before service"} },
+    { src:"assets/photos/stylist.jpg",  alt:{ko:"H.PLACE 디자이너",  en:"An H.PLACE stylist"} }
+  ],
+
+  /* 자주 묻는 질문 */
+  faq: [
+    { q:{ko:"어느 지점으로 가야 하나요?", en:"Which branch should I go to?"},
+      a:{ko:"묵고 계신 곳만 알려주시면 가장 가까운 지점과 가는 방법을 보내드립니다. 서초·교대·잠실 지점은 지하철에서 가깝고, 서초아크로비스타점은 주차가 편합니다.",
+         en:"Just tell us where you are staying and we will send you the nearest branch and how to get there. Seocho, Gyodae and Jamsil are close to the subway, and Seocho Acro Vista has easy parking."} },
+    { q:{ko:"영어로 상담이 되나요?", en:"Do you speak English?"},
+      a:{ko:"됩니다. 방문 전 메시지 상담은 영어, 일본어, 중국어로 가능합니다. 매장에서도 영어로 응대하며, 어려운 시술 용어는 사진과 함께 설명드립니다.",
+         en:"Yes. Pre-visit consultation is available in English, Japanese and Chinese. We speak English in the salon, and technical terms are always explained with photos."} },
+    { q:{ko:"곱슬머리나 아시아인이 아닌 모발도 가능한가요?", en:"Can you work with curly or non-Asian hair?"},
+      a:{ko:"가능합니다. 다만 모발 굵기와 곱슬 정도에 따라 방법이 달라지므로, 예약 전에 지금 머리 사진을 보내주시면 가능한 방법과 소요 시간을 먼저 알려드립니다.",
+         en:"Yes. The approach changes with hair thickness and curl pattern, so please send a photo of your hair before booking. We will tell you what is possible and how long it takes."} },
+    { q:{ko:"팁을 드려야 하나요?", en:"Should I tip?"},
+      a:{ko:"아닙니다. 한국 미용실에서는 팁 문화가 없습니다. 상담에서 안내드린 금액이 전부입니다.",
+         en:"No. Tipping is not customary at salons in Korea. The number we gave you in the consultation is the whole cost."} },
+    { q:{ko:"시간이 얼마나 걸리나요?", en:"How long will it take?"},
+      a:{ko:"커트는 약 1시간, 컬러는 2~3시간, 탈색이 필요한 밝은 컬러는 4시간 이상 걸릴 수 있습니다. 정확한 시간은 상담 때 알려드립니다.",
+         en:"About 1 hour for a cut, 2 to 3 hours for colour, and 4 hours or more for light colours that need bleaching. We give you the exact time in the consultation."} },
+    { q:{ko:"결제는 어떻게 하나요?", en:"How do I pay?"},
+      a:{ko:"해외 발급 카드, 현금, 알리페이, 위챗페이를 받습니다. 선결제를 원하시면 상담 때 말씀해 주세요.",
+         en:"We accept internationally issued cards, cash, Alipay and WeChat Pay. If you would like to pay in advance, just say so during the consultation."} },
+    { q:{ko:"결과가 마음에 들지 않으면요?", en:"What if I don't like the result?"},
+      a:{ko:"바로 말씀해 주세요. 시술 당일 또는 다음 날 안에 조정 가능한 부분은 추가 비용 없이 손봐드립니다.",
+         en:"Tell us right away. Anything that can be adjusted will be fixed at no extra cost, on the same day or the next."} }
+  ]
+};
+/* ═══════════════════════════════════════════════════════════════
+   ▲▲▲  여기까지만 고치시면 됩니다  ▲▲▲
+   아래 코드는 손대지 않으셔도 됩니다.
+   ═══════════════════════════════════════════════════════════════ */
+
+const IG_URL = "https://instagram.com/" + SALON.instagram;
+const IG_DM  = "https://ig.me/m/" + SALON.instagram;
+const WA_URL = "https://wa.me/" + SALON.whatsapp;
+
+let lang = new URLSearchParams(location.search).get("lang") === "en" ? "en" : "ko";
+
+/* 링크 연결 */
+["heroIg","finalIg","navCta","dockIg"].forEach(id => { const e=document.getElementById(id); if(e) e.href = IG_DM; });
+["heroWa","finalWa","dockWa","footWa"].forEach(id => { const e=document.getElementById(id); if(e) e.href = WA_URL; });
+["galIg","footIg"].forEach(id => { const e=document.getElementById(id); if(e) e.href = IG_URL; });
+document.getElementById("year").textContent = new Date().getFullYear();
+
+/* 메뉴 */
+document.getElementById("menuList").innerHTML = SALON.menu.map(m => `
+  <div class="menu-row">
+    <span class="menu-name" data-ko="${m.name.ko}" data-en="${m.name.en}">${m.name.ko}</span>
+    <span class="menu-desc" data-ko="${m.desc.ko}" data-en="${m.desc.en}">${m.desc.ko}</span>
+    <span class="menu-price">${m.price}</span>
+  </div>`).join("");
+
+/* 갤러리 */
+document.getElementById("gallery").innerHTML = SALON.gallery.map(g => g.src
+  ? `<figure class="shot"><img src="${g.src}" alt="${g.alt.ko}" data-alt-ko="${g.alt.ko}" data-alt-en="${g.alt.en}" loading="lazy"></figure>`
+  : `<figure class="shot"><div class="ph"><b>PHOTO</b><span data-ko="${g.alt.ko}" data-en="${g.alt.en}">${g.alt.ko}</span></div></figure>`
+).join("");
+
+/* 신뢰 수치 */
+document.getElementById("trustNums").innerHTML = SALON.trust.map(t => `
+  <div class="tnum rv">
+    <b>${t.num}</b>
+    <span data-ko="${t.label.ko}" data-en="${t.label.en}">${t.label.ko}</span>
+  </div>`).join("");
+
+/* 지점 목록 */
+const mapOf = n => "https://map.naver.com/p/search/" + encodeURIComponent("에이치플레이스 " + n);
+document.getElementById("branchList").innerHTML = SALON.branches.map(b => `
+  <div class="br rv">
+    <span class="br-area">${b.area}</span>
+    <p class="br-name" data-ko="${b.name.ko}" data-en="${b.name.en}">${b.name.ko}</p>
+    <p class="br-line"><i data-ko="주소" data-en="Address">주소</i><span data-ko="${b.addr.ko}" data-en="${b.addr.en}">${b.addr.ko}</span></p>
+    <p class="br-line"><i data-ko="전화" data-en="Phone">전화</i><span>${b.tel}</span></p>
+    <p class="br-line"><i data-ko="시간" data-en="Hours">시간</i><span>${b.hours}</span></p>
+    <div class="br-foot">
+      <a href="${mapOf(b.name.ko)}" target="_blank" rel="noopener" data-ko="지도 보기" data-en="Map">지도 보기</a>
+      <a href="tel:${b.tel.replace(/-/g,"")}" data-ko="전화 걸기" data-en="Call">전화 걸기</a>
+    </div>
+  </div>`).join("");
+
+/* 전 지점 공통 안내 */
+document.getElementById("commonInfo").innerHTML = SALON.common.map(i => `
+  <div class="info-row">
+    <b data-ko="${i.label.ko}" data-en="${i.label.en}">${i.label.ko}</b>
+    <span data-ko="${i.value.ko}" data-en="${i.value.en}">${i.value.ko}</span>
+  </div>`).join("");
+
+/* FAQ */
+document.getElementById("faqList").innerHTML = SALON.faq.map(f => `
+  <details>
+    <summary data-ko="${f.q.ko}" data-en="${f.q.en}">${f.q.ko}</summary>
+    <div class="ans" data-ko="${f.a.ko}" data-en="${f.a.en}">${f.a.ko}</div>
+  </details>`).join("");
+
+/* 언어 전환 */
+function applyLang(next){
+  lang = next;
+  document.documentElement.lang = next;
+  document.querySelectorAll("[data-ko][data-en]").forEach(el => { el.innerHTML = el.dataset[next]; });
+  document.querySelectorAll("img[data-alt-ko]").forEach(el => { el.alt = el.dataset["alt" + (next === "ko" ? "Ko" : "En")]; });
+  document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.lang === next)));
+}
+document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => applyLang(b.dataset.lang)));
+if (lang === "en") applyLang("en");
+
+/* 첫 화면은 기다리지 않고 바로 보이게 합니다 */
+requestAnimationFrame(() => {
+  document.querySelectorAll("header.hero .rv").forEach(el => el.classList.add("in"));
+});
+
+/* 스크롤 진입 애니메이션 (자바스크립트가 막혀도 내용은 항상 보입니다) */
+if ("IntersectionObserver" in window){
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+  }, { threshold:.12, rootMargin:"0px 0px -6% 0px" });
+  document.querySelectorAll("section .rv, .final .rv").forEach(el => io.observe(el));
+} else {
+  document.querySelectorAll(".rv").forEach(el => el.classList.add("in"));
+}
+setTimeout(() => document.querySelectorAll(".rv").forEach(el => {
+  const r = el.getBoundingClientRect();
+  if (r.top < innerHeight * 1.2) el.classList.add("in");
+}), 1200);
+
+/* 시그니처 : 세로 헤어라인이 스크롤에 맞춰 그려집니다 */
+const hlIo = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.style.height = "100%"; });
+}, { threshold:.1 });
+document.querySelectorAll(".hairline").forEach(el => hlIo.observe(el));
+
+/* 스크롤하면 상단바에 선이 생깁니다 */
+const navEl = document.getElementById("nav");
+const onScroll = () => navEl.classList.toggle("solid", window.scrollY > 40);
+onScroll();
+window.addEventListener("scroll", onScroll, { passive:true });
+</script>
+</body>
+</html>
