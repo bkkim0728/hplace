@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Murmur — AI assistants that answer like your best agent</title>
+<meta name="description" content="Build an AI chatbot on your own knowledge in minutes. Streaming answers, 40+ languages, and a handoff to humans when it matters.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  /* neutral base */
+  --bg:#fafaf9;
+  --surface:#ffffff;
+  --surface-2:#f4f4f2;
+  --line:#e7e5e1;
+  --ink:#18181b;
+  --ink-2:#52525b;
+  --ink-3:#71717a;
+  /* AI purple accent */
+  --primary:#7c3aed;
+  --primary-hover:#6d28d9;
+  --on-primary:#ffffff;
+  --primary-ink:#6d28d9;
+  --primary-soft:#f3effd;
+  --primary-line:#ddd3fb;
+  --ring:#7c3aed;
+
+  --radius-sm:8px;
+  --radius:14px;
+  --radius-lg:20px;
+  --shadow:0 1px 2px rgba(24,24,27,.04),0 8px 24px -12px rgba(24,24,27,.12);
+  --shadow-lg:0 1px 2px rgba(24,24,27,.04),0 24px 60px -24px rgba(76,29,149,.28);
+  --ease-out:cubic-bezier(.22,.61,.36,1);
+  --dur-fast:150ms;
+  --dur:240ms;
+  --max:1120px;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0c0c0e;
+    --surface:#151518;
+    --surface-2:#1c1c20;
+    --line:#2a2a30;
+    --ink:#f4f4f5;
+    --ink-2:#b4b4bb;
+    --ink-3:#a1a1aa;
+    --primary:#7c3aed;
+    --primary-hover:#8b5cf6;
+    --primary-ink:#c4b5fd;
+    --primary-soft:#1f1833;
+    --primary-line:#3b2d63;
+    --ring:#a78bfa;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+    --shadow-lg:0 1px 2px rgba(0,0,0,.4),0 24px 60px -24px rgba(124,58,237,.35);
+  }
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:16px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:clip;
+}
+a{color:inherit}
+img,svg{display:block}
+.icon{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.icon-sm{width:16px;height:16px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 24px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+:focus-visible{outline:2px solid var(--ring);outline-offset:3px;border-radius:6px}
+
+.skip{position:absolute;left:16px;top:-48px;z-index:100;background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:var(--radius-sm);text-decoration:none;transition:top var(--dur-fast)}
+.skip:focus{top:12px}
+
+/* ── Buttons ─────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  min-height:44px;padding:0 20px;border-radius:999px;
+  font:inherit;font-size:15px;font-weight:600;text-decoration:none;white-space:nowrap;
+  border:1px solid transparent;cursor:pointer;touch-action:manipulation;
+  transition:background-color var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out),transform var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast);
+}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--primary);color:var(--on-primary);box-shadow:0 1px 0 rgba(255,255,255,.18) inset,0 6px 16px -6px rgba(124,58,237,.55)}
+.btn-primary:hover{background:var(--primary-hover)}
+.btn-primary .icon{transition:transform var(--dur) var(--ease-out)}
+.btn-primary:hover .icon{transform:translateX(3px)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn-ghost:hover{background:var(--surface-2)}
+.btn-lg{min-height:52px;padding:0 28px;font-size:16px}
+
+/* ── Nav ─────────────────────────────── */
+.nav{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.4) blur(12px);-webkit-backdrop-filter:saturate(1.4) blur(12px);border-bottom:1px solid transparent;transition:border-color var(--dur)}
+.nav.scrolled{border-color:var(--line)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;height:64px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;letter-spacing:-.01em;text-decoration:none}
+.logo-mark{width:28px;height:28px;border-radius:8px;background:var(--primary);color:#fff;display:grid;place-items:center}
+.logo-mark .icon{width:16px;height:16px}
+.nav-links{display:flex;gap:4px;list-style:none}
+.nav-links a{display:inline-flex;align-items:center;min-height:40px;padding:0 12px;border-radius:8px;color:var(--ink-2);text-decoration:none;font-size:15px;font-weight:500;transition:color var(--dur-fast),background-color var(--dur-fast)}
+.nav-links a:hover{color:var(--ink);background:var(--surface-2)}
+.nav .btn{min-height:40px;padding:0 16px;font-size:14px}
+
+/* ── Hero ────────────────────────────── */
+.hero{padding:72px 0 56px;text-align:center;position:relative}
+.hero::before{
+  content:"";position:absolute;inset:-64px 0 auto;height:520px;z-index:-1;pointer-events:none;
+  background:radial-gradient(60% 60% at 50% 0%,color-mix(in srgb,var(--primary) 12%,transparent),transparent 70%);
+}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:999px;background:var(--surface);border:1px solid var(--line);font-size:13px;font-weight:500;color:var(--ink-2);margin-bottom:24px}
+.eyebrow b{background:var(--primary-soft);color:var(--primary-ink);font-weight:600;padding:2px 8px;border-radius:999px;font-size:12px}
+h1{font-size:clamp(36px,6vw,64px);line-height:1.05;letter-spacing:-.035em;font-weight:700;max-width:14ch;margin:0 auto;text-wrap:balance}
+h1 em{font-style:normal;color:var(--primary-ink)}
+.lede{font-size:clamp(17px,2vw,19px);color:var(--ink-2);max-width:56ch;margin:20px auto 0;text-wrap:pretty}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:32px}
+.fine{margin-top:14px;font-size:13px;color:var(--ink-3)}
+
+/* ── Chat preview ────────────────────── */
+.demo{max-width:760px;margin:56px auto 0;text-align:left}
+.chat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);overflow:hidden}
+.chat-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.agent{display:flex;align-items:center;gap:10px}
+.avatar{width:32px;height:32px;border-radius:50%;background:var(--primary-soft);color:var(--primary-ink);display:grid;place-items:center;flex:none}
+.avatar .icon{width:16px;height:16px}
+.agent-name{font-weight:600;font-size:14px;line-height:1.3}
+.agent-status{font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:6px}
+.dot{width:7px;height:7px;border-radius:50%;background:#16a34a}
+.icon-btn{width:36px;height:36px;display:grid;place-items:center;border-radius:8px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);cursor:pointer;transition:background-color var(--dur-fast),color var(--dur-fast)}
+.icon-btn:hover{background:var(--surface-2);color:var(--ink)}
+.icon-btn .icon{width:16px;height:16px}
+
+.log{padding:20px 18px;display:flex;flex-direction:column;gap:14px;height:340px;overflow-y:auto;scroll-behavior:smooth;overscroll-behavior:contain}
+.msg{display:flex;gap:10px;max-width:88%;animation:msg-in var(--dur) var(--ease-out) both}
+.msg.user{align-self:flex-end;flex-direction:row-reverse}
+.bubble{padding:10px 14px;border-radius:16px;font-size:15px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.msg.user .bubble{background:var(--ink);color:var(--bg);border-bottom-right-radius:6px}
+.msg.ai .bubble{background:var(--surface-2);color:var(--ink);border-bottom-left-radius:6px}
+.msg.ai .avatar{width:28px;height:28px;margin-top:2px}
+.caret{display:inline-block;width:.5em;height:1.05em;margin-left:1px;vertical-align:-.15em;background:var(--primary);border-radius:2px;animation:blink 1s steps(2,start) infinite}
+.typing{display:inline-flex;gap:4px;padding:4px 0}
+.typing i{width:6px;height:6px;border-radius:50%;background:var(--ink-3);animation:bounce 1.1s infinite var(--ease-out)}
+.typing i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3){animation-delay:.3s}
+.cite{display:inline-flex;align-items:center;gap:6px;margin-top:8px;font-size:12px;font-weight:500;color:var(--primary-ink);background:var(--primary-soft);border:1px solid var(--primary-line);padding:3px 10px;border-radius:999px;animation:msg-in var(--dur) var(--ease-out) both}
+.cite .icon{width:12px;height:12px}
+
+.chat-foot{border-top:1px solid var(--line);padding:12px 14px 14px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.chip{min-height:36px;padding:0 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink-2);font:inherit;font-size:13px;font-weight:500;cursor:pointer;transition:border-color var(--dur-fast),color var(--dur-fast),background-color var(--dur-fast)}
+.chip:hover{border-color:var(--primary-line);color:var(--ink)}
+.chip[aria-pressed="true"]{border-color:var(--primary);color:var(--primary-ink);background:var(--primary-soft)}
+.composer{display:flex;gap:8px;align-items:center;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;padding:4px 4px 4px 16px;transition:border-color var(--dur-fast)}
+.composer:focus-within{border-color:var(--primary)}
+.composer input{flex:1;min-width:0;border:0;background:transparent;font:inherit;font-size:16px;color:var(--ink);min-height:40px;outline:0}
+.composer input::placeholder{color:var(--ink-3)}
+.send{width:40px;height:40px;border-radius:50%;border:0;background:var(--primary);color:#fff;display:grid;place-items:center;cursor:pointer;flex:none;transition:background-color var(--dur-fast),transform var(--dur-fast)}
+.send:hover{background:var(--primary-hover)}
+.send:active{transform:scale(.94)}
+.send .icon{width:16px;height:16px}
+.demo-note{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--ink-3);padding:0 4px}
+.demo-note span{font-variant-numeric:tabular-nums}
+
+/* ── Sections ────────────────────────── */
+section{scroll-margin-top:72px}
+.section{padding:96px 0}
+.section-head{text-align:center;max-width:640px;margin:0 auto 48px}
+.kicker{font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--primary-ink);margin-bottom:12px}
+h2{font-size:clamp(28px,4vw,40px);line-height:1.15;letter-spacing:-.025em;font-weight:700;text-wrap:balance}
+.section-head p{color:var(--ink-2);margin-top:14px;font-size:17px}
+
+/* Integrations */
+.logos{padding:40px 0 16px}
+.logos p{text-align:center;font-size:14px;color:var(--ink-3);margin-bottom:20px}
+.logo-row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 12px;list-style:none}
+.logo-row li{display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:15px;color:var(--ink-2);letter-spacing:-.01em}
+.mono{width:22px;height:22px;border-radius:6px;background:var(--surface-2);border:1px solid var(--line);display:grid;place-items:center;font-size:11px;font-weight:700;color:var(--ink)}
+
+/* Features */
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:28px;transition:border-color var(--dur) var(--ease-out),box-shadow var(--dur) var(--ease-out),transform var(--dur) var(--ease-out)}
+.card:hover{border-color:var(--primary-line);box-shadow:var(--shadow);transform:translateY(-2px)}
+.card-icon{width:40px;height:40px;border-radius:10px;background:var(--primary-soft);color:var(--primary-ink);display:grid;place-items:center;margin-bottom:20px}
+.card h3{font-size:17px;font-weight:600;letter-spacing:-.01em;margin-bottom:8px}
+.card p{color:var(--ink-2);font-size:15px}
+.card .stat{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+.card .stat b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* Steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;list-style:none;counter-reset:step}
+.steps li{padding:24px 0 0;border-top:2px solid var(--line);counter-increment:step}
+.steps li:first-child{border-color:var(--primary)}
+.steps li::before{content:"0" counter(step);display:block;font-size:13px;font-weight:600;color:var(--primary-ink);margin-bottom:10px;font-variant-numeric:tabular-nums}
+.steps h3{font-size:17px;font-weight:600;margin-bottom:6px}
+.steps p{color:var(--ink-2);font-size:15px}
+
+/* Final CTA */
+.cta{padding:0 0 96px}
+.cta-box{position:relative;overflow:hidden;text-align:center;padding:72px 24px;border-radius:28px;background:var(--ink);color:var(--bg)}
+.cta-box::before{content:"";position:absolute;inset:auto -20% -60% -20%;height:120%;background:radial-gradient(50% 50% at 50% 50%,rgba(124,58,237,.55),transparent 70%);pointer-events:none}
+.cta-box > *{position:relative}
+.cta-box h2{max-width:18ch;margin:0 auto}
+.cta-box p{margin:14px auto 32px;max-width:46ch;opacity:.78;font-size:17px}
+.cta-box .fine{color:inherit;opacity:.65}
+@media (prefers-color-scheme:dark){
+  .cta-box{background:var(--surface-2);color:var(--ink);border:1px solid var(--line)}
+}
+
+footer{border-top:1px solid var(--line);padding:32px 0;color:var(--ink-3);font-size:14px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.foot ul{display:flex;gap:4px;list-style:none}
+.foot a{display:inline-flex;align-items:center;min-height:40px;padding:0 10px;text-decoration:none;border-radius:8px}
+.foot a:hover{color:var(--ink)}
+
+/* Reveal */
+.reveal{opacity:0;transform:translateY(16px);transition:opacity 450ms var(--ease-out),transform 450ms var(--ease-out)}
+.reveal.in{opacity:1;transform:none}
+
+@keyframes msg-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes blink{to{visibility:hidden}}
+@keyframes bounce{0%,80%,100%{transform:translateY(0);opacity:.5}40%{transform:translateY(-4px);opacity:1}}
+
+/* Responsive */
+@media (max-width:960px){
+  .features{grid-template-columns:repeat(2,1fr)}
+}
+@media (max-width:720px){
+  .nav-links{display:none}
+  .hero{padding:48px 0 40px}
+  .demo{margin-top:40px}
+  .log{height:320px;padding:16px 14px}
+  .msg{max-width:94%}
+  .section{padding:72px 0}
+  .features,.steps{grid-template-columns:1fr}
+  .cta-box{padding:56px 20px;border-radius:20px}
+}
+@media (max-width:420px){
+  .wrap{padding:0 16px}
+  .hero-cta .btn{width:100%}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
+  .caret{display:none}
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- Icon sprite (Lucide, ISC licence) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"/><path d="m21.854 2.147-10.94 10.939"/></symbol>
+  <symbol id="i-replay" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+  <symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></symbol>
+  <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-plug" viewBox="0 0 24 24"><path d="M12 22v-5"/><path d="M9 8V2"/><path d="M15 8V2"/><path d="M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></symbol>
+</svg>
+
+<header class="nav" id="nav">
+  <div class="wrap nav-inner">
+    <a class="logo" href="#top" aria-label="Murmur home">
+      <span class="logo-mark"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span>
+      Murmur
+    </a>
+    <nav aria-label="Primary">
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#integrations">Integrations</a></li>
+        <li><a href="#how">How it works</a></li>
+      </ul>
+    </nav>
+    <a class="btn btn-primary" href="#try">Try Now</a>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- Hero + live conversation preview -->
+  <section class="hero" id="top">
+    <div class="wrap">
+      <span class="eyebrow"><b>New</b> Streaming answers with sources</span>
+      <h1>Answers that feel <em>human</em>, at machine speed</h1>
+      <p class="lede">Murmur turns your docs, help centre and product data into an AI assistant that replies in real time, cites its sources, and hands off to your team when it should.</p>
+      <div class="hero-cta">
+        <a class="btn btn-primary btn-lg" href="#try">Try Now — it's free <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="btn btn-ghost btn-lg" href="#how">See how it works</a>
+      </div>
+      <p class="fine">No credit card. Your first assistant is live in about five minutes.</p>
+
+      <div class="demo reveal">
+        <div class="chat">
+          <div class="chat-head">
+            <div class="agent">
+              <span class="avatar"><svg class="icon" aria-hidden="true"><use href="#i-sparkles"/></svg></span>
+              <div>
+                <div class="agent-name">Murmur Assistant</div>
+                <div class="agent-status"><span class="dot" aria-hidden="true"></span>Online · answers from your knowledge base</div>
+              </div>
+            </div>
+            <button class="icon-btn" id="demoToggle" type="button" aria-label="Pause demo">
+              <svg class="icon" aria-hidden="true"><use href="#i-pause"/></svg>
+            </button>
+          </div>
+
+          <div class="log" id="log" role="log" aria-live="polite" aria-label="Demo conversation"></div>
+
+          <div class="chat-foot">
+            <div class="chips" role="group" aria-label="Example questions">
+              <button class="chip" type="button" data-prompt="0" aria-pressed="false">Refund policy</button>
+              <button class="chip" type="button" data-prompt="1" aria-pressed="false">Reset my password</button>
+              <button class="chip" type="button" data-prompt="2" aria-pressed="false">Summarise this ticket</button>
+            </div>
+            <form class="composer" id="composer">
+              <label for="ask" class="sr-only">Ask the demo assistant</label>
+              <input id="ask" type="text" autocomplete="off" placeholder="Ask anything…" maxlength="160">
+              <button class="send" type="submit" aria-label="Send"><svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></button>
+            </form>
+          </div>
+        </div>
+        <div class="demo-note">
+          <span>Interactive preview · replies are pre-written for this demo</span>
+          <span id="demoStat" aria-hidden="true"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Integrations -->
+  <section class="logos" id="integrations" aria-labelledby="int-title">
+    <div class="wrap">
+      <p id="int-title">Plugs into the tools your team already uses</p>
+      <ul class="logo-row">
+        <li><span class="mono" aria-hidden="true">S</span>Slack</li>
+        <li><span class="mono" aria-hidden="true">Z</span>Zendesk</li>
+        <li><span class="mono" aria-hidden="true">I</span>Intercom</li>
+        <li><span class="mono" aria-hidden="true">N</span>Notion</li>
+        <li><span class="mono" aria-hidden="true">S</span>Shopify</li>
+        <li><span class="mono" aria-hidden="true">H</span>HubSpot</li>
+        <li><span class="mono" aria-hidden="true">W</span>WhatsApp</li>
+        <li><span class="mono" aria-hidden="true">G</span>Google Drive</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section" id="features" aria-labelledby="feat-title">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">Capabilities</p>
+        <h2 id="feat-title">Everything a great support agent knows, on every page</h2>
+        <p>One assistant, trained on your content, deployed wherever your customers ask questions.</p>
+      </div>
+      <div class="features">
+        <article class="card reveal">
+          <div class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-db"/></svg></div>
+          <h3>Grounded in your knowledge</h3>
+          <p>Connect docs, PDFs and help articles. Every answer comes from your sources, with the citation attached.</p>
+          <div class="stat"><b>12</b> file types supported</div>
+        </article>
+        <article class="card reveal">
+          <div class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-zap"/></svg></div>
+          <h3>Streaming in real time</h3>
+          <p>Replies start appearing in a fraction of a second, so customers never stare at a spinner.</p>
+          <div class="stat">First words in under <b>400 ms</b></div>
+        </article>
+        <article class="card reveal">
+          <div class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg></div>
+          <h3>Fluent in 40+ languages</h3>
+          <p>Detects the customer's language and replies in kind, from one set of English source material.</p>
+          <div class="stat"><b>40+</b> languages, no extra setup</div>
+        </article>
+        <article class="card reveal">
+          <div class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-shield"/></svg></div>
+          <h3>Guardrails you control</h3>
+          <p>Set topics it won't touch, a tone it keeps, and the moment it passes the chat to a human.</p>
+          <div class="stat">Role-based access and audit logs</div>
+        </article>
+        <article class="card reveal">
+          <div class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-plug"/></svg></div>
+          <h3>Takes action, not just questions</h3>
+          <p>Look up an order, reset a password or open a ticket through your own APIs, with approval steps.</p>
+          <div class="stat">REST, webhooks and <b>8</b> native apps</div>
+        </article>
+        <article class="card reveal">
+          <div class="card-icon"><svg class="icon" aria-hidden="true"><use href="#i-chart"/></svg></div>
+          <h3>Learns where it falls short</h3>
+          <p>See the questions it couldn't answer and fill the gap with one click, straight from the report.</p>
+          <div class="stat">Weekly insights by topic</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section" id="how" aria-labelledby="how-title" style="padding-top:0">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <p class="kicker">How it works</p>
+        <h2 id="how-title">Live in three steps</h2>
+      </div>
+      <ol class="steps">
+        <li class="reveal"><h3>Connect your content</h3><p>Point Murmur at your help centre, upload files, or sync a workspace.</p></li>
+        <li class="reveal"><h3>Tune the voice</h3><p>Pick a tone, set guardrails, and test it in the playground before anyone sees it.</p></li>
+        <li class="reveal"><h3>Go live anywhere</h3><p>Paste one line of script on your site, or switch it on in Slack, WhatsApp or Zendesk.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="cta" id="try" aria-labelledby="cta-title">
+    <div class="wrap">
+      <div class="cta-box reveal">
+        <h2 id="cta-title">Your assistant is five minutes away</h2>
+        <p>Start free with 1,000 conversations a month. Upgrade only when it's pulling its weight.</p>
+        <a class="btn btn-primary btn-lg" href="#try">Try Now <svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <p class="fine">Free plan · no credit card · cancel anytime</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <span>© 2026 Murmur</span>
+    <ul>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">Docs</a></li>
+      <li><a href="#top">Privacy</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+(() => {
+  const CONVERSATIONS = [
+    {
+      q: "Can I get a refund if I cancel mid-month?",
+      a: "Yes. If you cancel within the first 14 days you get a full refund.\n\nAfter that, you keep access until the end of the billing period and won't be charged again. Annual plans are refunded pro rata for unused months.",
+      src: "Billing & refunds policy"
+    },
+    {
+      q: "I forgot my password, how do I reset it?",
+      a: "No problem. Here's the quickest way:\n\n1. Go to the sign-in page and choose \"Forgot password\".\n2. Enter the email on your account.\n3. Open the link we send you within 30 minutes and pick a new password.\n\nWant me to send the reset email to you now?",
+      src: "Account help · Sign-in"
+    },
+    {
+      q: "Summarise ticket #4821 for me.",
+      a: "Ticket #4821: the customer's order arrived with a damaged lid.\n\n• Asked for a replacement, not a refund\n• Photos attached, order is within warranty\n• Suggested next step: approve a free replacement and share tracking",
+      src: "Zendesk · Ticket #4821"
+    }
+  ];
+  const FALLBACK = "That's a great question. In this preview I can only answer the example topics above, but your own Murmur assistant would answer it from your knowledge base, with a source attached.\n\nTap \"Try Now\" to build one in about five minutes.";
+
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const log = document.getElementById("log");
+  const chips = [...document.querySelectorAll(".chip")];
+  const toggle = document.getElementById("demoToggle");
+  const stat = document.getElementById("demoStat");
+  const ns = "http://www.w3.org/2000/svg";
+
+  let run = 0;          // bumps on every new stream so old loops stop
+  let paused = false;
+  let visible = true;
+  let autoIndex = 0;
+  let autoplay = !reduced;
+  let autoTimer;
+
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const waitWhilePaused = async (id) => { while ((paused || !visible) && id === run) await sleep(120); };
+
+  function icon(name, cls = "icon") {
+    const svg = document.createElementNS(ns, "svg");
+    svg.setAttribute("class", cls);
+    svg.setAttribute("aria-hidden", "true");
+    const use = document.createElementNS(ns, "use");
+    use.setAttribute("href", "#i-" + name);
+    svg.appendChild(use);
+    return svg;
+  }
+
+  function addMessage(role, text = "") {
+    const row = document.createElement("div");
+    row.className = "msg " + role;
+    if (role === "ai") {
+      const av = document.createElement("span");
+      av.className = "avatar";
+      av.appendChild(icon("sparkles"));
+      row.appendChild(av);
+    }
+    const col = document.createElement("div");
+    const bubble = document.createElement("div");
+    bubble.className = "bubble";
+    bubble.textContent = text;
+    col.appendChild(bubble);
+    row.appendChild(col);
+    log.appendChild(row);
+    scrollDown();
+    return { bubble, col };
+  }
+
+  function scrollDown() { log.scrollTop = log.scrollHeight; }
+
+  function setPressed(index) {
+    chips.forEach((c, i) => c.setAttribute("aria-pressed", String(i === index)));
+  }
+
+  async function play(convo, index = -1) {
+    const id = ++run;
+    clearTimeout(autoTimer);
+    setPressed(index);
+    log.replaceChildren();
+    log.setAttribute("aria-busy", "true");
+    stat.textContent = "";
+
+    addMessage("user", convo.q);
+    const { bubble, col } = addMessage("ai");
+
+    if (reduced) {
+      bubble.textContent = convo.a;
+      finish(col, convo, id, 0, 0);
+      return;
+    }
+
+    // "thinking" indicator
+    bubble.innerHTML = '<span class="typing" aria-label="Assistant is typing"><i></i><i></i><i></i></span>';
+    await sleep(650);
+    await waitWhilePaused(id);
+    if (id !== run) return;
+
+    const text = document.createTextNode("");
+    const caret = document.createElement("span");
+    caret.className = "caret";
+    bubble.replaceChildren(text, caret);
+
+    const tokens = convo.a.match(/\s+|[^\s]+/g) || [];
+    const started = performance.now();
+    let words = 0;
+    for (const tok of tokens) {
+      await waitWhilePaused(id);
+      if (id !== run) return;
+      text.data += tok;
+      if (/\S/.test(tok)) words++;
+      stat.textContent = `Streaming · ${words} words`;
+      scrollDown();
+      await sleep(/\n/.test(tok) ? 140 : 28 + Math.random() * 42);
+    }
+    caret.remove();
+    finish(col, convo, id, words, performance.now() - started);
+  }
+
+  function finish(col, convo, id, words, ms) {
+    if (id !== run) return;
+    log.setAttribute("aria-busy", "false");
+    if (convo.src) {
+      const cite = document.createElement("span");
+      cite.className = "cite";
+      cite.appendChild(icon("file"));
+      cite.append("Source: " + convo.src);
+      col.appendChild(cite);
+      scrollDown();
+    }
+    stat.textContent = words ? `Streamed ${words} words in ${(ms / 1000).toFixed(1)}s` : "";
+    if (!autoplay) setIdle(true);
+    if (autoplay) {
+      autoTimer = setTimeout(async () => {
+        await waitWhilePaused(id);
+        if (id !== run || !autoplay) return;
+        autoIndex = (autoIndex + 1) % CONVERSATIONS.length;
+        play(CONVERSATIONS[autoIndex], autoIndex);
+      }, 3500);
+    }
+  }
+
+  let idle = false;
+  function setPaused(p) {
+    paused = p;
+    idle = false;
+    toggle.setAttribute("aria-label", p ? "Resume demo" : "Pause demo");
+    toggle.replaceChildren(icon(p ? "play" : "pause"));
+  }
+  function setIdle(on) {
+    idle = on;
+    toggle.setAttribute("aria-label", "Replay demo");
+    toggle.replaceChildren(icon("replay"));
+  }
+
+  // User takes over: stop the auto tour
+  chips.forEach((chip, i) => chip.addEventListener("click", () => {
+    autoplay = false;
+    setPaused(false);
+    play(CONVERSATIONS[i], i);
+  }));
+
+  document.getElementById("composer").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const input = document.getElementById("ask");
+    const q = input.value.trim();
+    if (!q) { input.focus(); return; }
+    autoplay = false;
+    setPaused(false);
+    input.value = "";
+    const lower = q.toLowerCase();
+    const match = CONVERSATIONS.findIndex((c, i) =>
+      [["refund", "cancel"], ["password", "reset", "sign in", "login"], ["summar", "ticket"]][i].some((k) => lower.includes(k)));
+    const convo = match >= 0 ? { ...CONVERSATIONS[match], q } : { q, a: FALLBACK, src: "" };
+    play(convo, match);
+  });
+
+  toggle.addEventListener("click", () => {
+    if (idle) {
+      autoplay = !reduced;
+      setPaused(false);
+      play(CONVERSATIONS[autoIndex], autoIndex);
+      return;
+    }
+    setPaused(!paused);
+  });
+
+  // Pause the stream when the preview is off screen or the tab is hidden
+  const demo = document.querySelector(".demo");
+  new IntersectionObserver(([e]) => { visible = e.isIntersecting && !document.hidden; }, { threshold: .2 }).observe(demo);
+  document.addEventListener("visibilitychange", () => { if (document.hidden) visible = false; });
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll(".reveal");
+  if (reduced || !("IntersectionObserver" in window)) {
+    reveals.forEach((el) => el.classList.add("in"));
+  } else {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (!e.isIntersecting) return;
+        const siblings = [...e.target.parentElement.children].filter((c) => c.classList.contains("reveal"));
+        e.target.style.transitionDelay = Math.min(siblings.indexOf(e.target), 5) * 50 + "ms";
+        e.target.classList.add("in");
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px -8% 0px" });
+    reveals.forEach((el) => io.observe(el));
+  }
+
+  // Nav border once the page scrolls
+  const nav = document.getElementById("nav");
+  const onScroll = () => nav.classList.toggle("scrolled", scrollY > 8);
+  addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
+
+  play(CONVERSATIONS[0], 0);
+})();
+</script>
+</body>
+</html>
